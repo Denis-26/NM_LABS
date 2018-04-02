@@ -1,41 +1,28 @@
-from math import factorial as fac
-import numpy as np
+import tools
 
-def difference_table(X, Y, x_0, dx, n):
-    res = []
-    while len(Y):
-        dY = [(Y[i] - Y[i-1]) for i in range(1, len(Y))]
-        if not any(dY):
-            break
-        dY = [round(_, 4) for _ in dY]
-        res.append(dY.copy())
-        Y = dY.copy()
-        dY = []
-    for i in res:
-        print(i)
+def task_1(X, Y, step, q_func, nodes):
+    table = tools.difference_table(X, Y)
+    last = list(map(lambda cell: cell[-1], table))
+    return [tools.P_x(q_func(x, X[-1], step), Y[-1], last) for x in nodes]
 
-
-def calc_q(q, q_f, count):
-    if count == 0:
-        return q
-    return q*(q_f + count)
-
-def P_x(q, y_n, DY):
-    count = 0
-    q_f = q
-    res = y_n
-    for y in DY:
-        q = calc_q(q, q_f, count)
-        res += (q * y) / fac(count+1)
-        count += 1
-    return res
+def task_3(X, Y, nodes):
+    L_i = tools.L(X, Y)
+    return [L_i(n) for n in nodes]
 
 if __name__ == '__main__':
-    X = [15, 20, 25, 30, 35, 40, 45, 50, 55]
-    Y = [0.2588, 0.3420, 0.4226, 0.5000, 0.5736, 0.6428, 0.7071, 0.7660, 0.8192]
-    difference_table(X, Y, 1, 2, 10)
-    last = [0.0532, -0.0057, -0.0003, 0.0002, 0.0002, 0.0003, 0.0005, 0.0008]
-    q = lambda x, x_n, h: (x - x_n)/h
-    for x in [14, 27, 32, 48, 56]:
-        print("q =", q(x, 55, 5))
-        print(P_x(q(x, 55, 5), 0.8192, last))
+    step = 0.005
+
+    X1 = tools.gen_x(1.415, step, 13)
+    Y1 = tools.get_y_data("data_task1.txt")
+
+    X2 = [0.298, 0.303, 0.310, 0.317, 0.323, 0.330, 0.339, 0.350, 0.359]
+    Y2 = tools.get_y_data("data_task3.txt")
+
+    q_func = lambda x, x_n, h: (x - x_n)/h
+
+    nodes1 = [1.4625 - 0.001*n for n in range(1, 31)]
+    nodes2 = [0.765 - 0.025*n for n in range(5, 16)]
+
+    res1 = task_1(X1, Y1, step, q_func, nodes1)
+    res2 = task_3(X2, Y2, nodes2)
+    
